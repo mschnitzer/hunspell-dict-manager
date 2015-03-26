@@ -16,7 +16,7 @@ import os
 
 def arg_parser():
     parser = argparse.ArgumentParser()
-    parser.add_argument("-o", help="add")
+    parser.add_argument("-o", help="option (add, del or build)")
     parser.add_argument("-w", help="word")
     parser.add_argument("-f", help="file")
     parser.add_argument("-d", help="dictionary output file")
