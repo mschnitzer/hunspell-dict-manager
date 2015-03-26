@@ -31,6 +31,9 @@ def arg_parser():
     if args.o in ('add', 'del') and not args.f:
         parser.error("Missing filename")
 
+    if args.o == "build" and os.geteuid() != 0:
+        parser.error("You have to be root to build the dictionary because you can't touch the /usr/share/myspell directory as user.")
+
     return args
 
 def sort_file(args):
@@ -49,6 +52,8 @@ def sort_file(args):
         lines.append(word)
     elif args.o == 'del':
         lines.remove(word)
+    else:
+        pass
 
     lines = sorted(list(set(lines)))
     f.seek(0)
@@ -60,7 +65,6 @@ def spell_add(args):
     """
     Adding words to wordlist
     """
-    print(args)
     sort_file(args)
     print("Word added: " + args.w)
 
@@ -75,11 +79,19 @@ def spell_build(args):
     """
     Build dictionary
     """
-    if os.geteuid() != 0:
-        print("You have to be root to build the dictionary because you can't touch the /usr/share/myspell directory as user.")
-    else:
-        os.system("wc -l " + args.f + " > /usr/share/myspell/" + args.d + ".dic && sort " + args.f + " | uniq >> /usr/share/myspell/" + args.d + ".dic && touch /usr/share/myspell/" + args.d + ".aff")
-        print("Generated dictionary")
+    num_lines = sum(1 for line in open(args.f))
+    wcline = "{} {}\n".format(num_lines, args.f)
+
+    D="/usr/share/myspell/"
+    open(D + args.d + ".aff", "w").close()
+
+    sort_file(args.f)
+    with open(args.f, "r") as infile:
+        with open(D + args.d + ".dic", "w") as outfile:
+            outfile.write(wcline)
+            for inlines in infile:
+                outfile.write(inlines)
+    print("Generated dictionary")
 
 if __name__ == '__main__':
     args = arg_parser()
