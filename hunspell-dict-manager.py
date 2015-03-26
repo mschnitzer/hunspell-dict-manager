@@ -33,19 +33,42 @@ def arg_parser():
 
     return args
 
+def sort_file(args):
+    """
+    Adds or deletes words in a file
+
+    Avoids race condition by avoiding any intermediate files
+    """
+    lines=[]
+    f = open(args.f, 'r+')
+    lines = [ i  for i in f ]
+
+    word = args.w+'\n'
+
+    if args.o == 'add' and word not in lines:
+        lines.append(word)
+    elif args.o == 'del':
+        lines.remove(word)
+
+    lines = sorted(list(set(lines)))
+    f.seek(0)
+    f.writelines(lines)
+    f.truncate()
+    f.close()
+
 def spell_add(args):
     """
     Adding words to wordlist
     """
     print(args)
-    os.system("cat " + args.f + " > /tmp/wordlistmgr.tmp && echo \"" + args.w + "\" >> /tmp/wordlistmgr.tmp && rm " + args.f + " && touch " + args.f + " && sort /tmp/wordlistmgr.tmp | uniq >> " + args.f + " && rm /tmp/wordlistmgr.tmp")
+    sort_file(args)
     print("Word added: " + args.w)
 
 def spell_del(args):
     """
     Deleting word from wordlist
     """
-    os.system("cat " + args.f + " > /tmp/wordlistmgr.tmp && cat /tmp/wordlistmgr.tmp | grep -v ^" + args.w + "$ > " + args.f + " && rm /tmp/wordlistmgr.tmp")
+    sort_file(args)
     print("Deleted word: " + args.w)
 
 def spell_build(args):
