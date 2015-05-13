@@ -8,7 +8,7 @@
 #         This script is currently not using the best way to manage a dictionary.
 #         It is just a wrapper for the bash commands and does nothing else than
 #         executing bash commands. I will adjust this in the near future.
-#         PS: this is my first real python program so don't complain abaut it! :P
+#         PS: this is my first real python program so don't complain about it! :P
 #######################################################################################
 
 import argparse
